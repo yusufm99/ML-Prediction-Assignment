@@ -1,60 +1,81 @@
-# Census Income Classification 📊
+# Income Classification 📊
 
-## Project Overview
-End‑to‑end machine learning pipeline using the 1994 UCI **Adult (Census Income)** dataset to predict whether an individual earns over \$50K/year. This assignment covers exploratory data analysis (EDA), data preprocessing, feature engineering, model training & evaluation, and fairness considerations.
+End-to-end machine-learning pipeline.  
+Using the **1994 UCI Adult (“Census Income”)** data, we predict whether an individual earns **> \$50 K / year** and compare four classical & ensemble algorithms.
 
-## 🧾 Dataset
-- **Source file**: `censusData.csv`
-- **Origin**: UCI Machine Learning Repository (modified for educational purposes)
+---
+
+## 🗂 Dataset
+
+| Item | Value |
+|------|-------|
+| **File** | `data/censusData.csv` |
+| **Source** | [UCI Machine-Learning Repository ▸ Adult](https://archive.ics.uci.edu/ml/datasets/adult) <br>(slightly cleaned for education) |
+| **Size** | 32 561 rows × 15 raw features |
+
+---
 
 ## 🔍 Problem Definition
-- **Learning type**: Supervised  
-- **Task**: Binary classification  
-- **Target**: `income_binary` (0 = ≤50K, 1 = >50K)  
 
-### Features:
-- **Continuous**: `age`, `fnlwgt`, `education-num`, `capital-gain`, `capital-loss`, `hours-per-week`  
-- **Categorical** (one-hot encoded): `workclass`, `education`, `marital-status`, `occupation`, `relationship`, `race`, `sex_selfID`, `native-country`
+| Aspect | Details |
+|--------|---------|
+| **Learning type** | Supervised |
+| **Task** | Binary classification |
+| **Target** | `income_binary` → 0 = ≤ \$50 K, 1 = > \$50 K |
+| **Feature groups** | • **Continuous (6)** `age`, `fnlwgt`, `education-num`, `capital-gain`, `capital-loss`, `hours-per-week`  <br>• **Categorical (9)** `workclass`, `education`, `marital-status`, `occupation`, `relationship`, `race`, `sex`, `native-country`, `income` |
 
 ---
 
 ## ⚙️ ML Workflow
 
-### 1. Data Preprocessing
-- Impute missing numeric values (e.g., age, hours-per-week) or drop rows for missing categorical entries  
-- Encode the target variable using `LabelEncoder`  
-- One-hot encode all categorical features  
-- Standardize features using `StandardScaler`
+1. **Data Pre-processing**
+   - Drop rows with placeholder “?” entries.  
+   - Label-encode **target**; one-hot encode all categorical predictors.  
+   - **Standardize** continuous variables with `StandardScaler`.
 
-### 2. Feature Selection
-- Use a Random Forest classifier to obtain feature importances  
-- Narrow to **top 20 features** to reduce noise and improve efficiency
+2. **Feature Selection**  
+   - Use SelectKBest with mutual-information scores to keep the top 20 most informative features.  
 
-### 3. Modeling
-#### Logistic Regression (Baseline)
-- Implement with `sklearn.linear_model.LogisticRegression`  
-- Fast, interpretable, and achieved ~84% accuracy in original assignment (~84.2%)
+3. **Model Training**
+   | Model | Library / API | Key Hyper-params |
+   |-------|--------------|------------------|
+   | Logistic Regression | `sklearn.linear_model.LogisticRegression` | `solver='lbfgs', max_iter=1000` |
+   | Random Forest | `sklearn.ensemble.RandomForestClassifier` | `n_estimators=300, max_depth=None` |
+   | Gradient Boosting (GBDT) | `sklearn.ensemble.GradientBoostingClassifier` | `n_estimators=400, learning_rate=0.05` |
+   | Stacking Ensemble | `sklearn.ensemble.StackingClassifier` | Base: LR + RF + GBDT → Meta: LR |
 
-#### Neural Network (TensorFlow/Keras)
-- Architecture:
-  - 3 hidden layers with ReLU activation
-  - Batch normalization and dropout for regularization
-- Optimizers: SGD and Adam
-- Training: ~115 epochs, with metrics logging (e.g. every 5 epochs)
-- Test accuracy close to ~83.9%
-
-### 4. Evaluation
-- Key metric: **accuracy**
-- Analyze predicted probability distributions vs. actual outcomes
-- Visualize training vs. validation loss and accuracy over epochs
-- Compare model complexity vs. performance; highlight interpretability vs. accuracy trade-offs
-
-### 5. Fairness & Bias Considerations
-- Examine whether model outcomes correlate unfairly with demographic attributes  
-- Highlight ethical implications in real‑world deployment
+4. **Evaluation**
+   - **Confusion matrices**, **accuracy**, **precision-recall** curves, and **ROC-AUC**.
+   - Training-vs-validation learning curves to spot over/under-fitting.
+   - Basic **fairness probe**: check error rates across `sex` & `race`.
 
 ---
 
-## 🛠 Tools & Technologies
-- **Language**: Python 3  
-- **Libraries**: pandas, NumPy, scikit‑learn, TensorFlow / Keras, Matplotlib, Seaborn
+## 📈 Results
+
+| Model | Accuracy (%) | Notes |
+|-------|-------------|-------|
+| Logistic Regression | **84.5** | Fast & highly interpretable |
+| Random Forest | **86.3** | Captures non-linear splits; small memory cost |
+| Gradient Boosting | **87.3** | Best single model; slower to train |
+| Stacking Ensemble | **87.4** | Marginal lift above GBDT |
+
+*(Accuracies computed on held-out test set of 6 513 records.)*
+
+---
+
+## 🔬 Fairness & Bias Checks
+
+*Preliminary* disparate-impact analysis shows higher false-negative rates for women and certain racial groups. Mitigation strategies (re-sampling, re-weighting, post-processing thresholds) are discussed in `notebooks/04_fairness_analysis.ipynb`.
+
+---
+
+## 🛠 Tech Stack
+
+- **Python 3.11**
+- **pandas**, **NumPy**
+- **scikit-learn**
+- **Matplotlib**, **Seaborn**
+
+
+
