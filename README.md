@@ -28,7 +28,7 @@ End‑to‑end machine learning pipeline using the 1994 UCI **Adult (Census Inco
 
 ### 2. Feature Selection
 - Use a Random Forest classifier to obtain feature importances  
-- Narrow to e.g. **top 50 features** to reduce noise and improve efficiency
+- Narrow to **top 20 features** to reduce noise and improve efficiency
 
 ### 3. Modeling
 #### Logistic Regression (Baseline)
